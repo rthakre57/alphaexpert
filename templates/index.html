@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Question Management System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #f3084b, #ed7fd3, #42e55d, #ea87a3);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      margin: 0;
+      padding: 40px;
+    }
+    @keyframes gradientBG {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, 200px);
+      gap: 20px;
+    }
+
+    .menu a {
+      display: block;
+      padding: 15px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      text-align: center;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .menu a:hover {
+      background-color: #4caf50;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .section-title {
+      grid-column: span 2;
+      font-size: 18px;
+      font-weight: bold;
+      color: #444;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      margin-top: 20px;
+    }
+     /* Logout button position */
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background-color: #dc3545;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.2s ease-in-out;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .logout-btn:hover {
+      background-color: #b52b27;
+    }
+    .flash {
+  padding: 10px;
+  margin: 10px auto;
+  width: 90%;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+.flash.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+.flash.danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+.flash.warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.dashboard-btn {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  background-color: #007B5E;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.dashboard-btn:hover {
+  background-color: #005f47;
+}
+
+
+  </style>
+</head>
+<body>
+  <div id="flash-messages">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+<a href="/dashboard" class="dashboard-btn">📊 Dashboard(Student Registration Data)</a>
+<a href="/logout" class="logout-btn">🚪 Logout</a>
+<h2>Question Management System</h2>
+
+<div class="container">
+  <div class="menu">
+    <div class="section-title">Class Management</div>
+    <a href="/add-class">➕ Add Class</a>
+    <a href="/view-classes">📘 View Classes</a>
+
+    <div class="section-title">Subject Management</div>
+    <a href="/add-subject">➕ Add Subject</a>
+    <a href="/view-subjects">📗 View Subjects</a>
+
+    <div class="section-title">Topic Management</div>
+    <a href="/add-topic">➕ Add Topic</a>
+    <a href="/view-topics">📙 View Topics</a>
+
+    <div class="section-title">Question Management</div>
+    <a href="/add-question">➕ Add Question</a>
+    <a href="/view-questions">📕 View Questions</a>
+  </div>
+</div>
+<script>
+  setTimeout(() => {
+    const flash = document.getElementById("flash-messages");
+    if (flash) flash.style.display = "none";
+  }, 4000);
+</script>
+</body>
+</html>

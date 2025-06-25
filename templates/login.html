@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Portal</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 16px;
+      background-image: url('/static/images/watermark.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.8);
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-box {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 40px;
+      width: 420px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: white;
+      font-size: 28px;
+    }
+
+    input {
+      width: 95%;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    button {
+      background-color: #007B5E;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 20px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .link-btn {
+      background: none;
+      color: #fff;
+      font-size: 18px;
+      text-decoration: underline;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .flash {
+      padding: 10px;
+      margin: 10px auto;
+      width: 90%;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .flash.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .flash.danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .flash.warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+.glass-title-box {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  padding: 20px 30px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 0 60px rgba(0, 255, 255, 0.3); /* soft neon-like glow */
+
+  background-image: url('/static/images/glow-shadow.png'); /* Optional: use your custom image */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 1000;
+}
+
+
+  </style>
+</head>
+<body>
+
+<!-- Flash Messages -->
+<div id="flash-messages">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="loginOverlay">
+<div class="glass-title-box">
+  <span>α Experts Questions with Generative AI Solution</span>
+</div>
+  <!-- Admin Login -->
+  <div class="modal-box" id="adminLoginBox" style="display:none;">
+    <h2>Admin Login</h2>
+    <form method="POST" action="/admin-login">
+      <input type="text" name="username" placeholder="Admin Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <button class="link-btn" onclick="switchToStudent()">Switch to Student Login</button>
+  </div>
+
+  <!-- Student Login -->
+  <div class="modal-box" id="studentLoginBox" style="display:block;">
+    <h2>Student Login</h2>
+    <form method="POST" action="/student-login">
+      <input type="text" name="username" placeholder="Student Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <button class="link-btn" onclick="switchToForgot()">Forgot Password?</button>
+    <button class="link-btn" onclick="switchToRegister()">New User? Register</button>
+    <button class="link-btn" onclick="switchToAdmin()">Switch to Admin Login</button>
+  </div>
+
+  <!-- Student Registration -->
+  <div class="modal-box" id="studentRegisterBox" style="display:none;">
+    <h2>Student Registration</h2>
+    <form method="POST" action="/student-register">
+      <input type="text" name="name" placeholder="Your Name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="mobile" placeholder="Mobile Number" required>
+      <input type="text" name="username" placeholder="Choose Username" required>
+      <input type="password" name="password" placeholder="Choose Password" required>
+      <button type="submit">Register</button>
+    </form>
+    <button class="link-btn" onclick="switchToStudent()">Back to Student Login</button>
+  </div>
+
+  <!-- Forgot Password -->
+  <div class="modal-box" id="forgotPasswordBox" style="display:none;">
+    <h2>Recover Credentials</h2>
+    <form method="POST" action="/forgot-password">
+      <input type="email" name="email" placeholder="Enter your registered email" required>
+      <button type="submit">Send Credentials</button>
+    </form>
+    <button class="link-btn" onclick="switchToStudent()">Back to Login</button>
+  </div>
+
+</div>
+
+<!-- Scripts -->
+<script>
+  function switchToStudent() {
+    document.getElementById('adminLoginBox').style.display = 'none';
+    document.getElementById('studentRegisterBox').style.display = 'none';
+    document.getElementById('forgotPasswordBox').style.display = 'none';
+    document.getElementById('studentLoginBox').style.display = 'block';
+  }
+
+  function switchToRegister() {
+    document.getElementById('studentLoginBox').style.display = 'none';
+    document.getElementById('studentRegisterBox').style.display = 'block';
+  }
+
+  function switchToAdmin() {
+    document.getElementById('studentLoginBox').style.display = 'none';
+    document.getElementById('studentRegisterBox').style.display = 'none';
+    document.getElementById('forgotPasswordBox').style.display = 'none';
+    document.getElementById('adminLoginBox').style.display = 'block';
+  }
+
+  function switchToForgot() {
+    document.getElementById('studentLoginBox').style.display = 'none';
+    document.getElementById('forgotPasswordBox').style.display = 'block';
+  }
+
+  // Auto-hide flash messages
+  setTimeout(() => {
+    const flash = document.getElementById("flash-messages");
+    if (flash) flash.style.display = "none";
+  }, 4000);
+
+  // Load Student Login first
+  window.addEventListener('DOMContentLoaded', () => {
+    switchToStudent();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Classes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 90%;
+      max-width: 700px;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #007B5E;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    a.delete-link {
+      color: #d9534f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a.delete-link:hover {
+      color: #b52b27;
+    }
+
+    .back-link {
+      margin-top: 25px;
+      text-decoration: none;
+      color: #007B5E;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      color: #004f3a;
+    }
+
+    @media (max-width: 600px) {
+      table, th, td {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>All Classes</h2>
+
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Class Name</th>
+      <th>Action</th>
+    </tr>
+    {% for c in classes %}
+    <tr>
+      <td>{{ c[0] }}</td>
+      <td>{{ c[1] }}</td>
+      <td>
+        <a class="delete-link" href="/delete-class/{{ c[0] }}" onclick="return confirm('Delete this class?')">🗑 Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <a href="/login" class="back-link">← Back to Home</a>
+
+</body>
+</html>
