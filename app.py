@@ -17,7 +17,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("models/gemini-2.5-flash-preview-05-20")
-app.secret_key = os.getenv('your_secret_key')
+app.secret_key = os.getenv("your_secret_key","default_fallback_secret")
 
 username = os.getenv('USERNAME1')
 password = os.getenv('PASSWORD')
