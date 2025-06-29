@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Questions</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fbfc;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2, h3 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      color: #444;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: #007B5E;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #005f47;
+    }
+
+    table {
+      width: 100%;
+      max-width: 1000px;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background-color: #007B5E;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    a.delete-link {
+      color: #d9534f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a.delete-link:hover {
+      color: #b52b27;
+    }
+
+    .back-link {
+      margin-top: 30px;
+      text-decoration: none;
+      color: #007B5E;
+      font-weight: 500;
+    }
+
+    .back-link:hover {
+      color: #004f3a;
+    }
+
+    @media (max-width: 768px) {
+      table, th, td {
+        font-size: 14px;
+      }
+
+      form {
+        width: 100%;
+      }
+    }
+textarea {
+  font-size: 16px;
+  padding: 12px;
+  border-radius: 8px;
+  resize: both;               /* ✅ Allows both horizontal and vertical resizing */
+  width: 95%;
+  height: 180px;
+  min-width: 300px;
+  min-height: 100px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
+}
+
+  </style>
+</head>
+<body>
+
+  <h2>View Questions</h2>
+
+  <form method="POST">
+    <label>Class:</label>
+    <select name="class_id" onchange="this.form.submit()" required>
+      <option value="">-- Select Class --</option>
+      {% for c in classes %}
+        <option value="{{ c[0] }}" {% if c[0] == selected_class_id|int %}selected{% endif %}>{{ c[1] }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Subject:</label>
+    <select name="subject_id" onchange="this.form.submit()" required>
+      <option value="">-- Select Subject --</option>
+      {% for s in subjects %}
+        <option value="{{ s[0] }}" {% if s[0] == selected_subject_id|int %}selected{% endif %}>{{ s[1] }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Topic:</label>
+    <select name="topic_id" required>
+      <option value="">-- Select Topic --</option>
+      {% for topic in topics %}
+        <option value="{{ topic[0] }}" {% if topic[0] == selected_topic_id|int %}selected{% endif %}>{{ topic[1] }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">View Questions</button>
+  </form>
+
+  {% if questions %}
+    <h3>Questions</h3>
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Class</th>
+    <th>Subject</th>
+    <th>Topic</th>
+    <th>Question</th>
+    <th>Delete</th>
+    <th>Edit</th>
+    <th>Save</th>
+  </tr>
+  {% for q in questions %}
+  <tr>
+    <td>{{ q[0] | safe }}</td>
+    <td>{{ q[4] | safe }}</td> <!-- class name -->
+    <td>{{ q[3] | safe }}</td> <!-- subject name -->
+    <td>{{ q[2] | safe }}</td> <!-- topic name -->
+
+    <!-- Editable Question Column -->
+<td>
+  <span id="text-{{ q[0] | safe }}">{{ q[1] |safe }}</span>
+  <textarea id="edit-{{ q[0] |safe }}" style="display:none; width:100%; height:100px;">{{ q[1] |safe }}</textarea>
+</td>
+
+    <!-- Delete Column -->
+    <td>
+      <a class="delete-link" href="/delete-question/{{ q[0] |safe }}" onclick="return confirm('Delete this question?')">🗑 Delete</a>
+    </td>
+
+    <!-- Edit Column -->
+    <td>
+      <a href="#" class="edit-link" onclick="toggleEdit({{ q[0]|safe }})">✏️ Edit</a>
+    </td>
+
+    <!-- Save Column -->
+    <td>
+      <a href="#" class="save-link" onclick="saveEdit({{ q[0] |safe }})" style="display:none;">💾 Save</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+  {% endif %}
+
+  <a href="/login" class="back-link">← Back to Home</a>
+<script>
+  function toggleEdit(id) {
+    document.getElementById(`text-${id}`).style.display = 'none';
+    document.getElementById(`edit-${id}`).style.display = 'block';
+
+    document.querySelector(`#edit-${id}`).closest('tr').querySelector('.edit-link').style.display = 'none';
+    document.querySelector(`#edit-${id}`).closest('tr').querySelector('.save-link').style.display = 'inline';
+  }
+
+  function saveEdit(id) {
+    const newText = document.getElementById(`edit-${id}`).value;
+
+    fetch(`/update-question/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question_text: newText })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById(`text-${id}`).innerHTML = newText;
+        document.getElementById(`text-${id}`).style.display = 'inline';
+        document.getElementById(`edit-${id}`).style.display = 'none';
+
+        const row = document.getElementById(`edit-${id}`).closest('tr');
+        row.querySelector('.edit-link').style.display = 'inline';
+        row.querySelector('.save-link').style.display = 'none';
+              // ✅ Trigger MathJax re-rendering
+      if (window.MathJax && MathJax.typeset) {
+        MathJax.typesetPromise([document.getElementById(`text-${id}`)]);
+      }
+      } else {
+        alert("❌ Update failed.");
+      }
+    });
+  }
+</script>
+
+
+</body>
+</html>
+

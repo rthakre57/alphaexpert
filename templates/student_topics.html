@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Topic | Student Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+/* Global */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0b0b0f; /* Near black */
+  color: #e6e0f8;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #1b0033; /* Deep purple */
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(128, 0, 255, 0.3);
+  border-bottom: 1px solid #6600cc;
+}
+
+.navbar h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #cc99ff;
+}
+
+.navbar a {
+  color: #e0ccff;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar a.active,
+.navbar a:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px #9933ff;
+}
+
+/* Container */
+.container {
+  padding: 40px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+/* Section Heading */
+.container h2 {
+  font-size: 22px;
+  margin-bottom: 30px;
+  color: #cc99ff;
+}
+
+/* Topic List */
+ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+ul li {
+  background-color: #1a0d2b;
+  padding: 18px;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 10px rgba(128, 0, 255, 0.1);
+}
+
+ul li:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(204, 153, 255, 0.4);
+}
+
+/* Topic Links */
+.topic-link {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  background-color: #8000ff;
+  padding: 10px 20px;
+  display: inline-block;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.topic-link:hover {
+  background-color: #9900ff;
+}
+
+/* Back Link */
+.back-link {
+  display: inline-block;
+  margin-top: 40px;
+  color: #cc99ff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.back-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px #cc99ff;
+}
+
+
+    @media (max-width: 600px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .navbar a {
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <h1>Student Dashboard</h1>
+    <div>
+      <a href="/student-dashboard">🏠 Home</a>
+      <a href="#" class="active">📖 Topics</a>
+      <a href="#" onclick="logoutAllTabs()">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h2>Select a Topic</h2>
+    <ul>
+      {% for t in topics %}
+        <li><a class="topic-link" href="{{ url_for('student_questions', topic_id=t[0]) }}">{{ t[1] }}</a></li>
+      {% endfor %}
+    </ul>
+
+    <a class="back-link" href="{{ url_for('student_subjects', class_id=request.args.get('class_id', 1)) }}">← Back to Subjects</a>
+  </div>
+<script>
+function logoutAllTabs() {
+  const channel = new BroadcastChannel('auth_channel');
+  channel.postMessage('logout'); // Broadcast to all tabs
+  window.location.href = '/logout'; // Logout current tab
+}
+</script>
+
+</body>
+</html>

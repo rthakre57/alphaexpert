@@ -1,0 +1,554 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot with Question Modal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global Dark Theme */
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: #000;
+  color: #eee;
+  line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #111;
+  padding: 15px 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid rgb(232, 239, 232);
+}
+
+.navbar h1 {
+  font-size: 26px;
+  color: rgb(228, 234, 210);
+  font-weight: 600;
+}
+
+.navbar h2 {
+  font-size: 18px;
+  color: #ccc;
+  margin: 10px;
+}
+
+.navbar select {
+  background-color: #222;
+  color: rgb(225, 242, 242);
+  border: 1px solid rgb(227, 239, 204);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-left: 10px;
+}
+
+.navbar a {
+  color: rgb(227, 239, 59);
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Container */
+.container {
+  padding: 30px 40px;
+}
+
+.container h2 {
+  font-size: 24px;
+  color: rgb(23, 119, 19);
+  margin-bottom: 20px;
+}
+
+/* Search Input */
+#searchInput {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #444;
+  background: #111;
+  color: rgb(63, 150, 26);
+  border-radius: 6px;
+  margin-bottom: 25px;
+}
+
+/* Question Cards */
+.question {
+  background: #1a1a1a;
+  color: #eee;
+  padding: 16px;
+  margin-bottom: 15px;
+  margin-left: 10px;           /* 👈 Adds space from the left */
+  border-left: 4px solid rgb(189, 228, 61);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 255, 255, 0.1);
+  padding-left: 50px;  /* adds more internal spacing from the left */
+}
+
+
+.question button {
+  margin-top: 12px;
+  background: rgb(42, 139, 15);
+  color: #000;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.question button:hover {
+  background: #00cccc;
+  transform: scale(1.05);
+}
+
+/* Chatbot Modal */
+#chatbotModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #111;
+  width: 95vw;
+  max-width: 1000px;
+  max-height: 95vh;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+/* Modal Header */
+.modal-header {
+  background: rgb(26, 148, 30);
+  color: #000;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.fullscreen-btn,
+.close {
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #000;
+  transition: transform 0.2s ease;
+}
+
+.fullscreen-btn:hover,
+.close:hover {
+  transform: scale(1.2);
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Question Display */
+.question-text {
+  font-weight: bold;
+  color: rgb(223, 243, 243);
+  margin-bottom: 15px;
+}
+
+/* Chat Log */
+#chatlog {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Messages */
+.message {
+  padding: 10px 14px;
+  border-radius: 8px;
+  max-width: 80%;
+  font-size: 18px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.user-message {
+  align-self: flex-start;
+  background: #2f8f5f;
+  color: #fff;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background: #222;
+  color: rgb(222, 245, 245);
+}
+
+#chat-input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 18px;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1a1a1a;
+  color: rgb(232, 241, 241); /* Cyan text for good contrast */
+  border: 2px solid #333;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+#chat-input::placeholder {
+  color: #777; /* Placeholder color */
+  font-style: italic;
+}
+
+#chat-input:focus {
+  border-color: rgb(234, 243, 243);
+  box-shadow: 0 0 8px rgb(234, 237, 237);
+}
+
+/* Webkit-based browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;         /* Track background */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(235, 247, 247);         /* Scrollbar thumb */
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e5eded;      /* Hover effect */
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(226, 241, 241) #111;  /* thumb color | track color */
+}
+
+.spinner {
+  border: 6px solid rgba(255, 255, 255, 0.1);
+  border-top: 6px solid #00ffc8;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.9s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Spinner container */
+#loadingSpinner {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 10px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 6px solid rgba(255,255,255,0.1);
+  border-top: 6px solid #00ffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #121212;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', sans-serif;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,255,255,0.05);
+}
+
+thead {
+  background-color: #1e1e1e;
+}
+
+thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: bold;
+  color: #00ffff;
+  border-bottom: 1px solid #2c2c2c;
+}
+
+tbody tr {
+  border-bottom: 1px solid #2c2c2c;
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background-color: #1c1c1c;
+}
+
+tbody td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+tfoot {
+  background-color: #1e1e1e;
+  color: #aaa;
+  font-size: 14px;
+}
+
+
+  </style>
+</head>
+<body>
+<!-- Navbar -->
+  <div class="navbar">
+    <h1>Question-Portal</h1>
+       <h2>Select Prompt</h2>
+    <select id="promptSelect">
+    {% for key, value in prompts.items() %}
+      <option value="{{ key }}">{{ key }}</option>
+    {% endfor %}
+  </select>
+    <div>
+      <a href="{{ url_for('student_dashboard') }}">🏠 Home</a>
+      <a href="/logout">🚪 Logout</a>
+    </div>
+  </div>
+  <!-- Container -->
+  <div class="container">
+    <h2>Questions</h2>
+    <input type="text" id="searchInput" onkeyup="filterQuestions()" placeholder="🔍 Search question...">
+
+
+<div id="questionList">
+  {% for q in questions %}
+    <div class="question" data-question="{{ q[1] | escape }}">
+      {{ q[1] | safe }}
+      <br>
+      <button onclick="openChatbot(`{{ q[1] | escape | replace('\\', '\\\\') }}`)">🖊️ Explain</button>
+    </div>
+  {% endfor %}
+</div>
+
+
+  <!-- Chatbot Modal -->
+  <div id="chatbotModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>💬 Ask AI</h3>
+         <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+        <button class="close" onclick="closeChatbot()">✖</button>
+      </div>
+      <div class="modal-body">
+        <div class="question-text" id="chatbot-question">Loading...</div>
+      <!-- Spinner here -->
+      <div id="loadingSpinner">
+        <div class="spinner"></div>
+          <p>Please wait I am thinking to solve this question...</p>
+        </div>
+        <div id="chatlog"></div>
+      </div>
+      <input id="chat-input" type="text" placeholder="Ask a Question..." onkeypress="sendMessage(event)">
+    </div>
+  </div>
+
+ <script>
+    function filterQuestions() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const questions = document.querySelectorAll('.question');
+      questions.forEach(q => {
+        const text = q.dataset.question.toLowerCase();
+        q.style.display = text.includes(input) ? "block" : "none";
+      });
+    }
+
+    const chatbotModal = document.getElementById("chatbotModal");
+    const questionDisplay = document.getElementById("chatbot-question");
+    const chatInput = document.getElementById("chat-input");
+    const chatlog = document.getElementById("chatlog");
+
+    let chatHistory = [];
+
+    function openChatbot(question) {
+      chatbotModal.style.display = "flex";
+      questionDisplay.innerHTML = question;
+      chatlog.innerHTML = "";
+      chatInput.value = "";
+
+      chatHistory = [{ role: "user", content: question }];
+      if (window.MathJax) MathJax.typesetPromise([questionDisplay]);
+
+      sendInitialQuestion(question);
+    }
+
+    function closeChatbot() {
+      chatbotModal.style.display = "none";
+    }
+
+    function toggleFullscreen() {
+      const modal = document.querySelector('.modal-content');
+      if (!document.fullscreenElement) {
+        modal.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    }
+
+    function appendMessage(msg, sender = "bot") {
+      const div = document.createElement('div');
+      div.classList.add('message', sender === "user" ? 'user-message' : 'bot-message');
+      div.innerHTML = msg;
+      chatlog.appendChild(div);
+      chatlog.scrollTop = chatlog.scrollHeight;
+      if (window.MathJax) MathJax.typesetPromise([div]);
+    }
+
+function sendInitialQuestion(question) {
+  appendMessage("You: " + question, "user");
+  document.getElementById('loadingSpinner').style.display = 'flex';
+
+  const selectedKey = document.getElementById("promptSelect").value;
+
+  fetch('/ask', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      selected_key: selectedKey,
+      history: chatHistory
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('loadingSpinner').style.display = 'none';
+    const reply = data.reply || "⚠️ No reply.";
+    appendMessage("Expert: " + reply, "bot");
+    chatHistory.push({ role: "assistant", content: reply });
+  })
+  .catch(() => {
+    document.getElementById('loadingSpinner').style.display = 'none';
+    appendMessage("❌ Error contacting server.", "bot");
+  });
+}
+
+
+function sendMessage(e) {
+  if (e.key === 'Enter') {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    appendMessage("You: " + msg, "user");
+    chatHistory.push({ role: "user", content: msg });
+
+    chatInput.value = "...";
+    document.getElementById("loadingSpinner").style.display = "block"; // Show spinner
+
+    const selectedKey = document.getElementById("promptSelect").value;
+
+    fetch('/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        selected_key: selectedKey,
+        history: chatHistory
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      const reply = data.reply || "⚠️ No reply.";
+      appendMessage("Expert: " + reply, "bot");
+      chatHistory.push({ role: "assistant", content: reply });
+      chatInput.value = '';
+      document.getElementById("loadingSpinner").style.display = "none"; // Hide spinner
+    })
+    .catch(() => {
+      appendMessage("❌ Error connecting to server.", "bot");
+      chatInput.value = '';
+      document.getElementById("loadingSpinner").style.display = "none"; // Hide spinner
+    });
+  }
+}
+
+  // Toggle fullscreen mode
+  function toggleFullscreen() {
+    const modal = document.querySelector('.modal-content');
+    if (!document.fullscreenElement) {
+      if (modal.requestFullscreen) modal.requestFullscreen();
+      else if (modal.webkitRequestFullscreen) modal.webkitRequestFullscreen(); // Safari
+      else if (modal.msRequestFullscreen) modal.msRequestFullscreen(); // IE11
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+  }
+
+</script>
+
+</body>
+</html>
