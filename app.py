@@ -29,6 +29,7 @@ def get_connection():
         user='root',
         password=os.getenv('DB_PASSWORD'),
         database='ai_questions'
+        port=3306
     )
 
 # Home
