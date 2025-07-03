@@ -42,7 +42,7 @@ def admin_login():
     input_username = request.form['username']
     input_password = request.form['password']
 
-    if input_username == 'admin' and input_password == 'admin123':
+    if input_username == username and input_password == password:
         session['admin_logged_in'] = True
         flash("✅ Login successful", "success")
         return redirect('/login')
