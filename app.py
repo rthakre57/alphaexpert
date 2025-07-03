@@ -25,11 +25,11 @@ password = os.getenv('PASSWORD')
 # MySQL connection config
 def get_connection():
     return mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password=os.getenv('DB_PASSWORD'),
-        database='ai_questions',
-        port=3306
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        port=int(os.getenv("DB_PORT", 3306))
     )
 
 # Home
@@ -474,8 +474,8 @@ def student_topics(subject_id):
 
 PROMPTS = {
     "Solution Generate": "Write in html+latex without document and <body>",
-    "Draw Diagram": "Draw Diagram in html without <body> on black background",
-    "Draw Tables": "Create necessary tables in html without <body> on black background:"
+    "Draw Diagram": "Draw Diagram in html with no <body> and no <style>",
+    "Draw Tables": "Create table in html with no <body> and no <style>",
 }
 
 @app.route('/questions/<int:topic_id>')
